@@ -5,6 +5,7 @@ from tkinter import filedialog
 from tkinter import *
 import requests
 
+from swm_client import Client
 from swm_client import FILEID_FACTOR
 from swm_client import fileIds
 from swm_client import updateFile
@@ -23,17 +24,18 @@ def getCreateTime(filePath):
     return int(os.path.getctime(filePath) * FILEID_FACTOR)
 
 
-def catalogueCurrentFiles(cwd):
-    arr = os.listdir(cwd)
+def catalogueCurrentFiles(client):
+    arr = os.listdir(client.cwd)
     for file in arr:
         if file == ".swm":
             continue
-        filePath = os.path.join(cwd, file)
+        filePath = os.path.join(client.cwd, file)
         fileIds[filePath] = getCreateTime(filePath)
+        updateFile(client.username, client.password, ACTIONS.get(1, "Unknown"), fileIds[filePath], filePath)
 
-def workloop(cwd):
+def workloop(client):
     dirHandle = win32file.CreateFile(
-        cwd,
+        client.cwd,
         FILE_LIST_DIRECTORY,
         win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE | win32con.FILE_SHARE_DELETE,
         None,
@@ -58,7 +60,7 @@ def workloop(cwd):
             None,
             None)
         for action, file in results:
-            filePath = os.path.join(cwd, file)
+            filePath = os.path.join(client.cwd, file)
             if action == 1:  # Created
                 fileIds[filePath] = getCreateTime(filePath)
                 fId = fileIds[filePath]
@@ -76,4 +78,4 @@ def workloop(cwd):
             print(ACTIONS.get(action, "Unknown"), filePath, fId)
 
         if fId and os.path.isfile(filePath):
-            updateFile(cwd, fId, filePath)
+            updateFile(client.username, client.password, ACTIONS.get(action, "Unknown"), fId, filePath)

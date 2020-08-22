@@ -3,12 +3,16 @@ import platform
 import time
 import requests
 
+from swm_client import Client
 from swm_client import FILEID_FACTOR
 from swm_client import fileIds
 from swm_client import updateFile
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+
+username = ""
+password = ""
 
 def creation_date(path_to_file):
     stat = os.stat(path_to_file)
@@ -29,9 +33,11 @@ def catalogueCurrentFiles(cwd):
         fileIds[filePath] = creation_date(filePath)
 
 class Watcher:
-    def __init__(self, dir):
+    def __init__(self, dir, _username, _password):
         self.observer = Observer()
         self.directory = dir
+        username = _username
+        password = _password
 
     def run(self):
         event_handler = Handler()
@@ -85,4 +91,4 @@ class Handler(FileSystemEventHandler):
             fId = fileIds[file]
 
         if fId and os.path.isfile(filePath):
-            updateFile(event.event_type, fId, filePath)
+            updateFile(username, password, event.event_type, fId, filePath)

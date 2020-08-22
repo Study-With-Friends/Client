@@ -13,32 +13,14 @@ ACTIONS = {
     5 : "Renamed to"
 }
 FILE_LIST_DIRECTORY = 0x0001
-FILEID_FACTOR = 10000
+FILEID_FACTOR = 1000000
 
 URL = "http://6bdff97a9214.ngrok.io/v1/files/upload"
 fileIds = {}
 
-username = ""
-password = ""
-
-# class Client:
-
-def getWorkingDir():
-    root = Tk()
-    root.withdraw()
-    selectedDir = filedialog.askdirectory(initialdir=os.getcwd())
-    return selectedDir
-
-def getCredentials(cwd):
-    try:
-        f = open(os.path.join(cwd, ".swm"), "r")
-        new_username = f.readline().strip()
-        new_password = f.readline().strip()
-        return new_username, new_password
-    except:
-        return None, None
-
-def updateFile(action, fileId, filePath):
+def updateFile(username, password, action, fileId, filePath):
+    if os.path.isdir(filePath):
+        return
     dataObj = {
         "action": action,
         "username": username,
@@ -51,28 +33,38 @@ def updateFile(action, fileId, filePath):
     })
     print(ret.text)
 
+class Client:
+    def __init__(self):
+        self.cwd = self.getWorkingDir()
+        self.getCredentials(self.cwd)
+    
+    def getWorkingDir(self):
+        root = Tk()
+        root.withdraw()
+        selectedDir = filedialog.askdirectory(initialdir=os.getcwd())
+        return selectedDir
+
+    def getCredentials(self, cwd):
+        try:
+            f = open(os.path.join(cwd, ".swm"), "r")
+            self.username = f.readline().strip()
+            self.password = f.readline().strip()
+            print(self.username, self.password)
+        except:
+            pass
+
 def main():
-    dir = getWorkingDir()
-    if not dir:
-        return
-        
-    username, password = getCredentials(dir)
+    client = Client()
 
-    if not username or not password:
-        print("No .swm file found in directory. Please create one with your username and password.")
-        return
-    else:
-        print(username, password)
-
-    print("Running SWM client in " + dir)
+    print("Running SWM client in " + client.cwd)
     if platform.system() == 'Windows':
         import swm_windows
-        swm_windows.catalogueCurrentFiles(dir)
-        swm_windows.workloop(dir)
+        swm_windows.catalogueCurrentFiles(client)
+        swm_windows.workloop(client)
     else:
         import swm_unix
-        swm_unix.catalogueCurrentFiles(dir)
-        w = swm_unix.Watcher(dir)
+        swm_unix.catalogueCurrentFiles(client.cwd)
+        w = swm_unix.Watcher(client.cwd, client.username. client.password)
         w.run()
 
 if __name__ == "__main__":
