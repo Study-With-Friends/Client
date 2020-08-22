@@ -5,14 +5,6 @@ import requests
 import platform
 import time
 
-ACTIONS = {
-    1 : "Created",
-    2 : "Deleted",
-    3 : "Modified",
-    4 : "Renamed from",
-    5 : "Renamed to"
-}
-FILE_LIST_DIRECTORY = 0x0001
 FILEID_FACTOR = 1000000
 
 URL = "http://6bdff97a9214.ngrok.io/v1/files/upload"
