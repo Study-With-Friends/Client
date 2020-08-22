@@ -25,6 +25,7 @@ def creation_date(path_to_file):
 
 
 def catalogueCurrentFiles(cwd):
+    global fileIds
     arr = os.listdir(cwd)
     for file in arr:
         if file == ".swm":
@@ -61,6 +62,7 @@ class Handler(FileSystemEventHandler):
         if event.is_directory:
             return None
 
+        global fileIds
         fId = 0
         filePath = event.src_path
         if event.event_type == 'created':

@@ -25,6 +25,7 @@ def getCreateTime(filePath):
 
 
 def catalogueCurrentFiles(client):
+    global fileIds
     arr = os.listdir(client.cwd)
     for file in arr:
         if file == ".swm":
@@ -34,6 +35,7 @@ def catalogueCurrentFiles(client):
         updateFile(client.username, client.password, ACTIONS.get(1, "Unknown"), fileIds[filePath], filePath)
 
 def workloop(client):
+    global fileIds
     dirHandle = win32file.CreateFile(
         client.cwd,
         FILE_LIST_DIRECTORY,
