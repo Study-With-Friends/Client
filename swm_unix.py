@@ -94,5 +94,5 @@ class Handler(FileSystemEventHandler):
             new_file = os.path.abspath(event.dest_path)
             fId = fileIds[file]
 
-        if fId and os.path.isfile(filePath):
+        if fId and not os.path.isdir(filePath):
             updateFile(username, password, event.event_type, fId, filePath)

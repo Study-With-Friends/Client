@@ -79,5 +79,5 @@ def workloop(client):
                 fId = fileIds[filePath]
             print(ACTIONS.get(action, "Unknown"), filePath, fId)
 
-        if fId and os.path.isfile(filePath):
+        if fId and not os.path.isdir(filePath):
             updateFile(client.username, client.password, ACTIONS.get(action, "Unknown"), fId, filePath)
