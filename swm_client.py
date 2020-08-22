@@ -10,10 +10,11 @@ ACTIONS = {
     2 : "Deleted",
     3 : "Modified",
     4 : "Renamed from",
-    5 : "to"
+    5 : "Renamed to"
 }
 FILE_LIST_DIRECTORY = 0x0001
 URL = "https://3affc17a5073.ngrok.io/v1/files/upload"
+fileIds = {}
 
 def getWorkingDir():
     root = Tk()
@@ -21,25 +22,29 @@ def getWorkingDir():
     selectedDir = filedialog.askdirectory(initialdir=os.getcwd())
     return selectedDir
 
+def catalogueCurrentFiles(cwd):
+    arr = os.listdir(cwd)
+    for file in arr:
+        fileIds[file] = os.path.getctime(os.path.join(cwd, file))
+
 def getCredentials(cwd):
     f = open(os.path.join(cwd, ".swm"), "r")
     email = f.readline().strip()
     password = f.readline().strip()
     return email, password
 
-def uploadFile(cwd, filePath):
+def updateFile(cwd, fileId, filePath):
     email, password = getCredentials(cwd)
     dataObj = {
         "email": email,
         "password": password,
-        "fileId": os.path.getctime(filePath)
+        "fileId": fileId
     }
-    print("Sending file", filePath)
-    print("'" + email + "'" + password + "'")
-    ret = requests.post(URL, data=dataObj, files={
-        "file": open(filePath,'rb')
-    })
-    print(ret.text)
+    print("Sending file", filePath, fileId)
+    # ret = requests.post(URL, data=dataObj, files={
+    #     "file": open(filePath,'rb')
+    # })
+    # print(ret.text)
 
 def workloop(cwd):
     print("Running SWM client in " + cwd)
@@ -53,6 +58,9 @@ def workloop(cwd):
                           None)
 
     while 1:
+        fId = 0
+        filePath = ""
+
         results = win32file.ReadDirectoryChangesW(
                             dirHandle,
                             4096,
@@ -67,11 +75,28 @@ def workloop(cwd):
                             None)
         for action, file in results:
             filePath = os.path.join(cwd, file)
-            print(ACTIONS.get(action, "Unknown"), filePath)
-            uploadFile(cwd, filePath)
+            if action == 1: # Created
+                fileIds[file] = os.path.getctime(filePath)
+                fId = fileIds[file]
+            elif action == 2: # Deleted
+                fId = fileIds[file]
+                fileIds.pop(file)
+            elif action == 3: # Modified
+                fId = fileIds[file]
+            elif action == 4: # Renamed from
+                fId = fileIds[file]
+                fileIds.pop(file)
+            elif action == 5: # Renamed to
+                fileIds[file] = os.path.getctime(filePath)
+                fId = fileIds[file]
+            print(ACTIONS.get(action, "Unknown"), filePath, fId)
+
+        if fId and os.path.isfile(filePath):
+            updateFile(cwd, fId, filePath)
 
 def main():
     dir = getWorkingDir()
+    catalogueCurrentFiles(dir)
     workloop(dir)
 
 if __name__ == "__main__":
