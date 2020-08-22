@@ -7,7 +7,7 @@ import time
 
 FILEID_FACTOR = 1000000
 
-URL = "http://localhost:5000/v1/files/upload"
+URL = "http://api.studynotes.space/v1/files/upload"
 fileIds = {}
 
 def updateFile(username, password, action, fileId, filePath):
@@ -20,9 +20,14 @@ def updateFile(username, password, action, fileId, filePath):
         "fileId": fileId
     }
     print("Sending file", action, filePath, fileId, username, password)
-    ret = requests.post(URL, data=dataObj, files={
-        "file": open(filePath, 'rb')
-    })
+    if action == 'deleted':
+        ret = requests.post(URL, data=dataObj, files={
+            "file": filePath
+        })
+    else:
+        ret = requests.post(URL, data=dataObj, files={
+            "file": open(filePath, 'rb')
+        })
     print(ret.text)
 
 class Client:
