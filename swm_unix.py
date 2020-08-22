@@ -68,7 +68,7 @@ class Handler(FileSystemEventHandler):
             # Take any action here when a file is first created.
             print("Received created event - %s." % event.src_path)
             filePath = os.path.abspath(event.src_path)
-            fileIds[tilePath] = creation_date(filePath)
+            fileIds[filePath] = creation_date(filePath)
             fId = fileIds[filePath]
 
         elif event.event_type == 'deleted':
