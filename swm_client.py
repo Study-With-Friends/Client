@@ -19,7 +19,7 @@ def updateFile(username, password, action, fileId, filePath):
         "password": password,
         "fileId": fileId
     }
-    print("Sending file", filePath, fileId, username, password)
+    print("Sending file", action, filePath, fileId, username, password)
     ret = requests.post(URL, data=dataObj, files={
         "file": open(filePath, 'rb')
     })

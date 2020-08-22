@@ -11,11 +11,11 @@ from swm_client import fileIds
 from swm_client import updateFile
 
 ACTIONS = {
-    1: "Created",
-    2: "Deleted",
-    3: "Modified",
-    4: "Renamed from",
-    5: "Renamed to"
+    1: "created",
+    2: "deleted",
+    3: "modified",
+    4: "renamed_from",
+    5: "renamed_to"
 }
 FILE_LIST_DIRECTORY = 0x0001
 
@@ -78,6 +78,6 @@ def workloop(client):
                 fileIds[filePath] = getCreateTime(filePath)
                 fId = fileIds[filePath]
             print(ACTIONS.get(action, "Unknown"), filePath, fId)
-
-        if fId and not os.path.isdir(filePath):
-            updateFile(client.username, client.password, ACTIONS.get(action, "Unknown"), fId, filePath)
+            
+            if fId and not os.path.isdir(filePath):
+                updateFile(client.username, client.password, ACTIONS.get(action, "Unknown"), fId, filePath)
