@@ -7,6 +7,9 @@ from swm_client import FILEID_FACTOR
 from swm_client import fileIds
 from swm_client import updateFile
 
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
 def creation_date(path_to_file):
     stat = os.stat(path_to_file)
     try:
@@ -31,12 +34,6 @@ class Watcher:
         self.directory = dir
 
     def run(self):
-        # unix imports
-        try:
-            from watchdog.observers import Observer
-            from watchdog.events import FileSystemEventHandler
-        except ImportError:
-            pass
         event_handler = Handler()
         self.observer.schedule(event_handler, self.directory, recursive=True)
         self.observer.start()

@@ -15,7 +15,7 @@ ACTIONS = {
 FILE_LIST_DIRECTORY = 0x0001
 FILEID_FACTOR = 10000
 
-URL = "https://3affc17a5073.ngrok.io/v1/files/upload"
+URL = "http://localhost:5000/v1/files/upload"
 fileIds = {}
 
 username = None
