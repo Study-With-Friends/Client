@@ -13,7 +13,8 @@ ACTIONS = {
     5 : "Renamed to"
 }
 FILE_LIST_DIRECTORY = 0x0001
-URL = "https://3affc17a5073.ngrok.io/v1/files/upload"
+URL = "http://6bdff97a9214.ngrok.io//v1/files/upload"
+FILEID_FACTOR = 100000
 fileIds = {}
 
 def getWorkingDir():
@@ -25,26 +26,30 @@ def getWorkingDir():
 def catalogueCurrentFiles(cwd):
     arr = os.listdir(cwd)
     for file in arr:
-        fileIds[file] = os.path.getctime(os.path.join(cwd, file))
+        if file == ".swm":
+            continue
+        filePath = os.path.join(cwd, file);
+        fileIds[filePath] = int(os.path.getctime(filePath) * FILEID_FACTOR)
+        updateFile(cwd, fileIds[filePath], filePath)
 
 def getCredentials(cwd):
     f = open(os.path.join(cwd, ".swm"), "r")
-    email = f.readline().strip()
+    username = f.readline().strip()
     password = f.readline().strip()
-    return email, password
+    return username, password
 
 def updateFile(cwd, fileId, filePath):
-    email, password = getCredentials(cwd)
+    username, password = getCredentials(cwd)
     dataObj = {
-        "email": email,
+        "username": username,
         "password": password,
         "fileId": fileId
     }
     print("Sending file", filePath, fileId)
-    # ret = requests.post(URL, data=dataObj, files={
-    #     "file": open(filePath,'rb')
-    # })
-    # print(ret.text)
+    ret = requests.post(URL, data=dataObj, files={
+        "file": open(filePath,'rb')
+    })
+    print(ret.text)
 
 def workloop(cwd):
     print("Running SWM client in " + cwd)
@@ -76,19 +81,19 @@ def workloop(cwd):
         for action, file in results:
             filePath = os.path.join(cwd, file)
             if action == 1: # Created
-                fileIds[file] = os.path.getctime(filePath)
-                fId = fileIds[file]
+                fileIds[filePath] = int(os.path.getctime(filePath) * FILEID_FACTOR)
+                fId = fileIds[filePath]
             elif action == 2: # Deleted
-                fId = fileIds[file]
-                fileIds.pop(file)
+                fId = fileIds[filePath]
+                fileIds.pop(filePath)
             elif action == 3: # Modified
-                fId = fileIds[file]
+                fId = fileIds[filePath]
             elif action == 4: # Renamed from
-                fId = fileIds[file]
-                fileIds.pop(file)
+                fId = fileIds[filePath]
+                fileIds.pop(filePath)
             elif action == 5: # Renamed to
-                fileIds[file] = os.path.getctime(filePath)
-                fId = fileIds[file]
+                fileIds[filePath] = int(os.path.getctime(filePath) * FILEID_FACTOR)
+                fId = fileIds[filePath]
             print(ACTIONS.get(action, "Unknown"), filePath, fId)
 
         if fId and os.path.isfile(filePath):
