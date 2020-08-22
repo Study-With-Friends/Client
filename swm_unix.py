@@ -34,6 +34,7 @@ def catalogueCurrentFiles(cwd):
 
 class Watcher:
     def __init__(self, dir, _username, _password):
+        print('init')
         self.observer = Observer()
         self.directory = dir
         username = _username

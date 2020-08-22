@@ -36,8 +36,8 @@ def updateFile(username, password, action, fileId, filePath):
 class Client:
     def __init__(self):
         self.cwd = self.getWorkingDir()
-        self.getCredentials(self.cwd)
-    
+        self.username, self.password = self.getCredentials(self.cwd)        
+        
     def getWorkingDir(self):
         root = Tk()
         root.withdraw()
@@ -47,11 +47,12 @@ class Client:
     def getCredentials(self, cwd):
         try:
             f = open(os.path.join(cwd, ".swm"), "r")
-            self.username = f.readline().strip()
-            self.password = f.readline().strip()
-            print(self.username, self.password)
-        except:
-            pass
+            newUsername = f.readline().strip()
+            newPassword = f.readline().strip()
+            return (newUsername, newPassword)
+        except Exception as e:
+            print(e)
+            return None, None            
 
 def main():
     client = Client()
@@ -64,7 +65,7 @@ def main():
     else:
         import swm_unix
         swm_unix.catalogueCurrentFiles(client.cwd)
-        w = swm_unix.Watcher(client.cwd, client.username. client.password)
+        w = swm_unix.Watcher(str(client.cwd), str(client.username), str(client.password))
         w.run()
 
 if __name__ == "__main__":
