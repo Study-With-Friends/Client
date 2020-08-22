@@ -15,11 +15,13 @@ ACTIONS = {
 FILE_LIST_DIRECTORY = 0x0001
 FILEID_FACTOR = 10000
 
-URL = "http://localhost:5000/v1/files/upload"
+URL = "http://6bdff97a9214.ngrok.io/v1/files/upload"
 fileIds = {}
 
-username = None
-password = None
+username = ""
+password = ""
+
+# class Client:
 
 def getWorkingDir():
     root = Tk()
