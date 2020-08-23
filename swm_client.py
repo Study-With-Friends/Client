@@ -7,7 +7,7 @@ import time
 
 FILEID_FACTOR = 1000000
 
-URL = "http://api.studynotes.space/v1/files/upload"
+URL = "http://localhost:5000/v1/files/upload"
 fileIds = {}
 
 def updateFile(username, password, action, fileId, filePath):
